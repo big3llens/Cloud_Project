@@ -27,13 +27,15 @@ public class OutHandler extends ChannelOutboundHandlerAdapter {
                 ctx.writeAndFlush(buf);
             }
 //            File file = new File(fw.getCurrentPath().toString(), arrMessage[1]);
-            File file = new File("1.txt");
+            File file = new File( "server/1.txt");
+            System.out.println(file.getPath());
+            System.out.println(file.getAbsolutePath());
             RandomAccessFile rf = new RandomAccessFile(file, "rw");
             long length = rf.length();
-            System.out.println("file size:" + length);
+            System.out.println("file size:" + rf.length());
             FileChannel fileChannel = rf.getChannel();
-            FileRegion fileRegion = new DefaultFileRegion(fileChannel, 0, length);
-            fileRegion.transferTo(rf.getChannel(), 0);
+//            FileRegion fileRegion = new DefaultFileRegion(fileChannel, 0, length);
+//            fileRegion.transferTo(rf.getChannel(), 0);
             ByteBuffer buffer = ByteBuffer.allocate(1024);
             int read = fileChannel.read(buffer);
             System.out.println(read);
@@ -76,6 +78,15 @@ public class OutHandler extends ChannelOutboundHandlerAdapter {
         message = (String) msg;
         buf.writeBytes(message.getBytes());
         ctx.writeAndFlush(buf);
+    }
+
+    public static ByteBuffer toNioBuffer(ByteBuf buffer) {
+        if (buffer.isDirect()) {
+            return buffer.nioBuffer();
+        }
+        final byte[] bytes = new byte[buffer.readableBytes()];
+        buffer.getBytes(buffer.readerIndex(), bytes);
+        return ByteBuffer.wrap(bytes);
     }
 }
 
