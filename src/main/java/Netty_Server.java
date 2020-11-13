@@ -8,6 +8,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.stream.ChunkedWriteHandler;
+
+import java.beans.Encoder;
+import java.util.Base64;
 
 
 public class Netty_Server {
@@ -24,7 +31,9 @@ public class Netty_Server {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast(
+                                    new ChunkedWriteHandler(),
                                     new OutHandler(),
+//                                    new LineBasedFrameDecoder(8192),
                                     new InHandler()
                             );
                         }

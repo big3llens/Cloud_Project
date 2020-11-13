@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -6,14 +7,40 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FileWorker {
-    static Path rootPath = Path.of("Server");
-    static Path currentPath = rootPath;
+    private Path rootPath;
+    private Path currentPath;
 
-    public static String changeDirectory(String dir) throws IOException {
+    public FileWorker(Path p) {
+        rootPath = p;
+        currentPath = rootPath;
+    }
+
+    public Path getCurrentPath() {
+        return currentPath;
+    }
+
+    public static void main(String[] args) {
+        FileWorker fw = new FileWorker(Path.of("server"));
+        try {
+            fw.makedirectory("d1");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String changeDirectory(String dir) throws IOException {
+        String[] arrDir = dir.split("/");
+        if (arrDir.length < 2) {
+            if (!Files.exists(Path.of(currentPath.toString() + "/" + dir))) {
+                return "Такой директории не существует";
+            }
+            currentPath = Path.of(currentPath.toString() + "/" + dir);
+            return new String("Текущая директория: " + currentPath.toString());
+        }
         Path newDir = Path.of(dir);
         if (!Files.exists(newDir)) {
             System.out.println("Такой директории не существует");
-            return rootPath.toString();
+            return "Такой директории не существует";
         }
         StringBuilder sb = new StringBuilder();
         if (!Files.isDirectory(newDir)) {
@@ -21,25 +48,27 @@ public class FileWorker {
                 sb.append(newDir.getName(i) + "/");
             }
             currentPath = Path.of(sb.toString());
-            return sb.toString();
+            return new String("Текущая директория: " + currentPath.toString());
         }
         currentPath = Path.of(newDir.toString());
-        return newDir.toString();
+        return new String("Текущая директория: " + currentPath.toString());
     }
 
-    public static void touch(String name) throws IOException {
+    public String touch(String name) throws IOException {
         if (!Files.exists(Path.of(currentPath.toString(), name + ".txt"))) {
             Files.createFile(Path.of(currentPath.toString(), name + ".txt"));
-        } else System.out.println("Такой файл уже существует");
+            return "Файл " + name + "успешно создан";
+        } else return "Такой файл уже существует";
     }
 
-    public static void makedirectory(String name) throws IOException {
+    public void makedirectory(String name) throws IOException {
         if (!Files.exists(Path.of(currentPath.toString() + "/" + name))) {
             Files.createDirectory(Path.of(currentPath.toString() + "/" + name));
-        } else System.out.println("Такая директория уже существует");
+        } else
+            System.out.println("Такая директория уже существует");
     }
 
-    public static String remove(String name) throws IOException {
+    public String remove(String name) throws IOException {
         List<String> filesList = Arrays.asList(currentPath.toFile().list());
         if (filesList == null) {
             return "В данной директории нет файлов";
@@ -53,15 +82,19 @@ public class FileWorker {
         return "В данной директории нет такого файла";
     }
 
-    public static void cope(String src, String target) throws IOException {
+    public String cope(String src, String target) throws IOException {
         Files.copy(Path.of(currentPath.toString(), src), Path.of(target), StandardCopyOption.REPLACE_EXISTING);
+        return "Файл сукопирован";
     }
 
-    public static String cat(String name) throws IOException {
+    public String cat(String name) throws IOException {
         if (Files.exists(Path.of(currentPath.toString(), name))) {
             if (Files.readString(Path.of(currentPath.toString(), name)) == null) return "Файл пустой";
             return Files.readString(Path.of(currentPath.toString(), name));
         }
         return "В данной директории нет такого файла";
+    }
+    public String getFilesList() {
+        return String.join(" ", new File(currentPath.toString()).list());
     }
 }
