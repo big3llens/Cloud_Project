@@ -31,7 +31,7 @@ public class Netty_Server {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast(
-                                    new ChunkedWriteHandler(),
+//                                    new ChunkedWriteHandler(),
                                     new OutHandler(),
 //                                    new LineBasedFrameDecoder(8192),
                                     new InHandler()

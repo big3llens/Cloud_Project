@@ -2,6 +2,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.FileRegion;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +13,7 @@ public class InHandler extends ChannelInboundHandlerAdapter {
         System.out.println("Клиент подключился");
         String firstMessage = "Добро пожаловать в хранилище!\n\rВам доступны следующие команды:\n\rcd (name direcory)- перейти в указанную директорию\n\rls- показать список файлов в текущей директории\n\r" +
                 "touch (name.txt)- создать текстовый файл\n\rmkdir (name)- создать директорию в текущей директории\n\rrm(name)- удалить файл\n\rcopy(src, target)- скопировать файл из одного пути в другой\n\r" +
-                "cat(name)- вывести в консоль содержимое файла";
+                "cat(name)- вывести в консоль содержимое файла\n\r";
         byte[] b = firstMessage.getBytes();
         String newMassege = new String(b, StandardCharsets.UTF_8);
         ByteBuf buf = ctx.alloc().directBuffer();
@@ -30,6 +31,7 @@ public class InHandler extends ChannelInboundHandlerAdapter {
             sb.append((char)buf.readByte());
         }
         String string = sb.toString();
+        System.out.println(sb.toString());
         byte[] b = string.getBytes();
         String encodeMessage = new String(b, StandardCharsets.UTF_8);
         System.out.println("InBound: " + encodeMessage);
